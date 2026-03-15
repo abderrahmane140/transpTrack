@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPUnit\Framework\MockObject\NoMoreReturnValuesConfiguredException;
+use PHPUnit\Framework\MockObject\Stub\ReturnReference;
 
 class User extends Authenticatable
 {
@@ -22,6 +24,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'avatar',
+        'is_active'
     ];
 
     /**
@@ -45,5 +51,34 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // ──────────────────────────────────────────
+    // Role Helper
+    // ──────────────────────────────────────────
+
+    public function isAdmin() {
+        return $this->role === 'admin';
+    }
+
+    public function isDriver() {
+        return $this->role === 'driver'; 
+    }
+
+    public function isEmployee() {
+        return $this->role === 'employee';
+    }
+
+
+    // ──────────────────────────────────────────
+    // Relationships
+    // ──────────────────────────────────────────
+
+    public function driver() {
+        return $this->hasOne(Driver::class);
+    }
+
+    public function employee() {
+        return $this->hasOne(Employee::class);
     }
 }
