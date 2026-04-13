@@ -7,6 +7,7 @@ use App\Models\Driver;
 use App\Models\Trip;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use App\Events\TripStatusChanged;
 
 class TripController extends Controller
 {
@@ -143,22 +144,25 @@ class TripController extends Controller
     {
         $user = $request->user();
 
-        // ── Only the assigned driver (or admin) can start the trip ─────────
-        if($user->isDriver()) {
+        // Only assigned driver (or admin)
+        if ($user->isDriver()) {
             $driver = $user->driver;
             if (!$driver || $driver->id !== $trip->driver_id) {
                 return response()->json([
                     'message' => 'You are not the assigned driver for this trip.',
                 ], 403);
-            };
+            }
         }
 
-        // ── State machine check ───────────────────────────────────────────
-        if($trip->status !== 'scheduled') {
+        // State check
+        if ($trip->status !== 'scheduled') {
             return response()->json([
                 'message' => "Trip cannot be started. Current status is '{$trip->status}'.",
             ], 422);
         }
+
+        // Save previous status BEFORE update
+        $previousStatus = $trip->status;
 
         $trip->update([
             'status'     => 'active',
@@ -167,13 +171,15 @@ class TripController extends Controller
 
         $trip->driver->update(['is_available' => false]);
 
+        // Dispatch event
+        event(new TripStatusChanged($trip, $previousStatus));
+
         $trip->load(['route.stops', 'vehicle', 'driver.user', 'latestLocation']);
 
         return response()->json([
             'message' => 'Trip started successfully.',
             'trip'    => $trip,
         ]);
-
     }
 
 
@@ -185,34 +191,40 @@ class TripController extends Controller
     {
         $user = $request->user();
 
-        // ── Only the assigned driver (or admin) can stop the trip ──────────
-        if($user->isDriver()){
+        // Only assigned driver (or admin)
+        if ($user->isDriver()) {
             $driver = $user->driver;
 
-            if(!$driver || $driver->id !== $trip->driver_id) {
+            if (!$driver || $driver->id !== $trip->driver_id) {
                 return response()->json([
                     'message' => 'You are not the assigned driver for this trip.',
                 ], 403);
             }
         }
 
-        // ── State machine check ───────────────────────────────────────────
+        // State check
         if ($trip->status !== 'active') {
             return response()->json([
                 'message' => "Trip cannot be stopped. Current status is '{$trip->status}'.",
             ], 422);
         }
 
+        //Save previous status BEFORE update
+        $previousStatus = $trip->status;
+
         $trip->update([
             'status'   => 'completed',
             'ended_at' => now(),
         ]);
 
-        // Mark driver as available again
+        // Mark driver available again
         $trip->driver->update(['is_available' => true]);
 
-        // Dispatch location cleanup job (compresses location history)
-        dispatch(new \App\Jobs\CompressTripLocations($trip))->delay(now()->addMinute());
+        // Dispatch event
+        event(new TripStatusChanged($trip, $previousStatus));
+
+        dispatch(new \App\Jobs\CompressTripLocations($trip))
+            ->delay(now()->addMinute());
 
         return response()->json([
             'message'          => 'Trip completed successfully.',
