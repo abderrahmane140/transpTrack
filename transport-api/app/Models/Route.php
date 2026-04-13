@@ -49,7 +49,7 @@ class Route extends Model
     // Relationships
     // ──────────────────────────────────────────
  
-    public function stop()
+    public function stops()
     {
         return $this->hasMany(RouteStop::class)->orderBy('order_number');
     }
