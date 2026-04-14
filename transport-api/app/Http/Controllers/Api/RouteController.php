@@ -115,7 +115,7 @@ class RouteController extends Controller
 
     public function destroy(Route $route)
     {
-        if($route->activeTrip()){
+        if($route->activeTrip){
             return response()->json([
                 'message' => 'Cannot delete a route with an active trip.',
             ], 422);
