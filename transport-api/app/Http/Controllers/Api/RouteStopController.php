@@ -15,7 +15,7 @@ class RouteStopController extends Controller
 
     public function index(Route $route)
     {
-        $stops = $route->stop()->orderBy('order_number')->get();
+        $stops = $route->stops()->orderBy('order_number')->get();
 
         return response()->json([
             'route' => $route->only('id', 'name', 'code'),
@@ -47,7 +47,7 @@ class RouteStopController extends Controller
             ], 422);
         }
 
-        $stop = $route->stop()->create($validated);
+        $stop = $route->stops()->create($validated);
 
         return response()->json([
             'message' => 'Stop added successfully.',
