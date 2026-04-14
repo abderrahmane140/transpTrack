@@ -28,11 +28,11 @@ class VehicleController extends Controller
             $query->where('type', $request->type);
         }
 
-        if($request->filled('searcj')) {
+        if($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search){
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('plate_numplate_numberber', 'like', "%{$search}%")
+                ->orWhere('plate_number', 'like', "%{$search}%")
                 ->orWhere('model', 'like', "%{$search}%");
             });
         }
@@ -115,7 +115,7 @@ class VehicleController extends Controller
      * DELETE /api/vehicles/{id}
      */
 
-    public function destory(Vehicle $vehicle)
+    public function destroy(Vehicle $vehicle)
     {
         if($vehicle->activeTrip){
             return response()->json([
