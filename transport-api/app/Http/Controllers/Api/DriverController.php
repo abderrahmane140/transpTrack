@@ -118,11 +118,11 @@ class DriverController extends Controller
 
         DB::beginTransaction();
         try{
-            //update usre fields
+            //update user fields
             $userFields = array_intersect_key($validated, array_flip(['name', 'phone', 'is_active']));
 
             if(!empty($userFields)){
-                $driver->user->updatee($userFields);
+                $driver->user->update($userFields);
             }
 
             //update driver fields
@@ -151,7 +151,7 @@ class DriverController extends Controller
 
     public function destroy(Driver $driver)
     {
-        if($driver->activeTrip()) {
+        if($driver->activeTrip) {
             return response()->json([
                 'message' => 'Cannot delete a driver with an active trip.',
             ],422);
@@ -175,7 +175,7 @@ class DriverController extends Controller
             'vehicle_id' => 'required|exists:vehicles,id',
         ]);
 
-        $vehicle = Vehicle::findOrFail($validated('vehicle_id'));
+        $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
 
         // Check if vehicle is already assigned to another driver
         $existingDriver = Driver::where('vehicle_id', $vehicle->id)
@@ -196,11 +196,12 @@ class DriverController extends Controller
         ]);
 
 
+        
+    }
+
     /**
      * DELETE /api/drivers/{id}/unassign-vehicle
      */
-
-}
     public function unassignVehicle(Driver $driver)
     {
         if ($driver->activeTrip) {
@@ -226,7 +227,7 @@ class DriverController extends Controller
     {
         $driver = $request->user()->driver;
 
-        if(!$driver || $driver->vehicle) {
+        if(!$driver || !$driver->vehicle) {
             return response()->json(['message' => 'No vehicle assigned.'], 404);
         }
 
