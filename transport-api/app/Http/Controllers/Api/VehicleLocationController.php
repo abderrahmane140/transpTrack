@@ -82,7 +82,7 @@ class VehicleLocationController extends Controller
         ], 60); // expires after 60 seconds of no updates
         // ── Broadcast to all listeners on this trip's channel ─────────────
         // This fires the WebSocket event that employees see on their map
-        Broadcast(new VehicleLocationUpdated($trip, $location))->toOthers();
+        broadcast(new VehicleLocationUpdated($trip, $location))->toOthers();
     
         return response()->json([
             'message'     => 'Location recorded.',
@@ -167,7 +167,7 @@ class VehicleLocationController extends Controller
             'id', 'latitude', 'longitude', 'speed', 'heading', 'recorded_at',
         ]);
 
-         // ── Interval sampling: thin out dense data for map rendering ──────
+        // ── Interval sampling: thin out dense data for map rendering ──────
         // e.g. interval=30 returns 1 point per 30 seconds instead of every 3s
         if ($request->filled('interval') && $locations->count() > 0) {
             $interval  = (int) $request->interval;
