@@ -17,6 +17,7 @@ class Driver extends Model
         'license_expiry',
         'license_type',
         'is_available',
+        'license_number',
         'notes'
     ];
 
