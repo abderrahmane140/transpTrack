@@ -139,7 +139,7 @@ class TripController extends Controller
     /**
      * POST /api/trips/{id}/start
      * Driver: start the trip — only the assigned driver can do this
-     */
+     */ 
     public function start(Request $request , Trip $trip)
     {
         $user = $request->user();
