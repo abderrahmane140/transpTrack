@@ -59,7 +59,7 @@ class Route extends Model
         return $this->hasMany(Employee::class);
     }
 
-    public function trip()
+    public function trips()
     {
         return $this->hasMany(Trip::class);
     }
