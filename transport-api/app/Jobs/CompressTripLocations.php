@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Jobs;
+namespace App\Jobs; 
 
 use App\Models\Trip;
 use App\Models\VehicleLocation;
