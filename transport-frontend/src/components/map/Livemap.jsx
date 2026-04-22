@@ -239,7 +239,7 @@ export default function LiveMap({
           subdomains={['a', 'b', 'c']}
           maxZoom={19}
           keepBuffer={4}
-        />
+        />1
 
         {/*
           ── PLANNED ROUTE LINE ──────────────────────────────────────────────
