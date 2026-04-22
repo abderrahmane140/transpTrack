@@ -3,7 +3,7 @@ import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import useTripStore from '../store/tripStore'
 
-window.Pusher = Pusher
+window.Pusher = Pusher //make the pusher gloabal 
 
 let echoInstance = null
 
