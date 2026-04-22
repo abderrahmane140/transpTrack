@@ -12,6 +12,7 @@ const titles = {
   '/admin/tracking':   'Live Tracking',
   '/driver':           'Driver Dashboard',
   '/employee':         'My Transport',
+  '/admin/trips':    'Trips', 
 }
 
 export default function TopBar() {
@@ -23,24 +24,37 @@ export default function TopBar() {
     weekday: 'long', month: 'long', day: 'numeric',
   })
 
-  return (
-    <header className="h-16 bg-surface-800 border-b border-white/5 px-6
-                       flex items-center justify-between shrink-0">
-      <div>
-        <h1 className="text-lg font-semibold text-white">{title}</h1>
-        <p className="text-xs text-white/30">{now}</p>
+return (
+  <header className="h-16 bg-white border-b border-gray-300 px-6
+                     flex items-center justify-between shrink-0">
+
+    {/* Title */}
+    <div>
+      <h1 className="text-lg font-semibold text-black">{title}</h1>
+      <p className="text-xs text-black/70">{now}</p>
+    </div>
+
+    {/* Right side */}
+    <div className="flex items-center gap-3">
+
+      {/* Notification */}
+      <button className="relative w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl
+                         flex items-center justify-center transition">
+        <Bell size={16} className="text-black" />
+        <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-600 rounded-full" />
+      </button>
+
+      {/* Avatar */}
+      <div className="w-9 h-9  rounded-xl flex items-center justify-center
+                      text-sm font-semibold text-white">
+        <img
+          src={user?.avatar || "/avatar.jpg"}
+          alt="avatar"
+          className="w-9 h-9 rounded-3xl object-cover"
+        />
       </div>
-      <div className="flex items-center gap-3">
-        <button className="relative w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl
-                           flex items-center justify-center transition-colors">
-          <Bell size={16} className="text-white/60" />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-500 rounded-full" />
-        </button>
-        <div className="w-9 h-9 bg-brand-600/30 rounded-xl flex items-center justify-center
-                        text-sm font-semibold text-brand-300">
-          {user?.name?.charAt(0).toUpperCase()}
-        </div>
-      </div>
-    </header>
-  )
+
+    </div>
+  </header>
+)
 }
