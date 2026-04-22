@@ -256,4 +256,29 @@ class DriverController extends Controller
 
         return response()->json(['trip' => $trip]);
      }
+
+
+    /* GET /api/my/scheduled-trip
+    * Driver gets their own next scheduled trip (not yet started)
+    */
+    public function myScheduledTrip(Request $request)
+    {
+        $driver = $request->user()->driver;
+
+        if (!$driver) {
+            return response()->json(['message' => 'Driver profile not found.'], 404);
+        }
+
+        $trip = \App\Models\Trip::where('driver_id', $driver->id)
+            ->where('status', 'scheduled')
+            ->with(['route.stops', 'vehicle'])
+            ->orderBy('scheduled_start')
+            ->first();
+
+        if (!$trip) {
+            return response()->json(['message' => 'No scheduled trip.', 'trip' => null]);
+        }
+
+        return response()->json(['trip' => $trip]);
+    }
 }
