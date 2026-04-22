@@ -1,9 +1,6 @@
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import {
-  LayoutDashboard, Truck, Users, UserCheck,
-  MapPin, Map, LogOut, Bus,
-} from 'lucide-react'
+import { LayoutDashboard, Truck, Users, UserCheck, MapPin, Map, LogOut, Bus, Route } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import toast from 'react-hot-toast'
 
@@ -13,8 +10,10 @@ const adminLinks = [
   { to: '/admin/drivers',   label: 'Drivers',       icon: UserCheck       },
   { to: '/admin/employees', label: 'Employees',     icon: Users           },
   { to: '/admin/routes',    label: 'Routes',        icon: MapPin          },
+  { to: '/admin/trips',     label: 'Trips',         icon: Route           }, // ← add this
   { to: '/admin/tracking',  label: 'Live Tracking', icon: Map             },
 ]
+
 const driverLinks   = [{ to: '/driver',   label: 'My Dashboard', icon: LayoutDashboard }]
 const employeeLinks = [{ to: '/employee', label: 'My Transport', icon: LayoutDashboard }]
 
@@ -35,18 +34,19 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-surface-800 border-r border-white/5 flex flex-col shrink-0">
+    <aside className="w-64 bg-white border-r border-gray-300 flex flex-col shrink-0">
 
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-white/5">
+      <div className="px-5 py-5 border-b border-gray-300">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center
-                          shadow-lg shadow-brand-900/50">
+          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
             <Bus size={18} className="text-white" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white leading-none">TransportTrack</p>
-            <p className="text-[10px] text-white/40 mt-0.5 uppercase tracking-widest">
+            <p className="text-sm font-semibold text-black leading-none">
+              TransportTrack
+            </p>
+            <p className="text-[10px] text-black/70 mt-0.5 uppercase tracking-widest">
               {user?.role}
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {links.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
@@ -62,11 +62,11 @@ export default function Sidebar() {
             end={to === '/admin' || to === '/driver' || to === '/employee'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-               transition-all duration-150
-               ${isActive
-                 ? 'bg-brand-600/20 text-brand-400 border border-brand-500/20'
-                 : 'text-white/50 hover:text-white hover:bg-white/5'
-               }`
+              transition
+              ${isActive
+                ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                : 'text-black hover:bg-gray-100'
+              }`
             }
           >
             <Icon size={17} className="shrink-0" />
@@ -76,21 +76,31 @@ export default function Sidebar() {
       </nav>
 
       {/* User footer */}
-      <div className="px-3 py-4 border-t border-white/5">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-8 h-8 bg-brand-600/30 rounded-full flex items-center justify-center
-                          text-xs font-semibold text-brand-300">
-            {user?.name?.charAt(0).toUpperCase()}
+      <div className="px-3 py-4 border-t border-gray-300">
+        <div className="flex items-center gap-3 px-3 py-2 mb-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center
+                          text-xs font-semibold text-white">
+                <img
+                    src={user?.avatar || "/avatar.jpg"}
+                    alt="avatar"
+                    className="w-9 h-8 rounded-3xl object-cover"
+                  />
           </div>
+
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-            <p className="text-xs text-white/40 truncate">{user?.email}</p>
+            <p className="text-sm font-medium text-black truncate">
+              {user?.name}
+            </p>
+            <p className="text-xs text-black/70 truncate">
+              {user?.email}
+            </p>
           </div>
         </div>
+
         <button
           onClick={handleLogout}
           className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-sm
-                     text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150"
+                    text-black hover:text-red-600 hover:bg-red-50 transition"
         >
           <LogOut size={15} />
           Sign out
