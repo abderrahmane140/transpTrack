@@ -1,102 +1,122 @@
 import React from 'react'
 import { X } from 'lucide-react'
 
-// ── StatCard ──────────────────────────────────────────────────────────────────
-export function StatCard({ icon: Icon, label, value, sub, color = 'brand' }) {
+// ── StatCard ─────────────────────────────────────────────
+export function StatCard({ icon: Icon, label, value, sub, color = 'blue' }) {
   const colors = {
-    brand:  'bg-brand-600/15 text-brand-400',
-    green:  'bg-green-500/15 text-green-400',
-    amber:  'bg-amber-500/15 text-amber-400',
-    red:    'bg-red-500/15 text-red-400',
-    purple: 'bg-purple-500/15 text-purple-400',
+    blue:   'bg-blue-100 text-blue-600',
+    green:  'bg-green-100 text-green-600',
+    amber:  'bg-amber-100 text-amber-600',
+    red:    'bg-red-100 text-red-600',
+    purple: 'bg-purple-100 text-purple-600',
   }
 
   return (
-    <div className="card flex items-start gap-4 animate-slide-up">
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${colors[color]}`}>
+    <div className="bg-white border border-gray-300 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
+
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${colors[color]}`}>
         <Icon size={20} />
       </div>
+
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-white/40 uppercase tracking-wider font-medium">{label}</p>
-        <p className="text-2xl font-semibold text-white mt-0.5">{value ?? '—'}</p>
-        {sub && <p className="text-xs text-white/40 mt-0.5">{sub}</p>}
+        <p className="text-xs text-black uppercase tracking-wider font-medium">
+          {label}
+        </p>
+
+        <p className="text-2xl font-semibold text-black mt-0.5">
+          {value ?? '—'}
+        </p>
+
+        {sub && <p className="text-xs text-black/70 mt-0.5">{sub}</p>}
       </div>
     </div>
   )
 }
 
-// ── Badge ─────────────────────────────────────────────────────────────────────
+// ── Badge ────────────────────────────────────────────────
 export function Badge({ status }) {
   const styles = {
-    active:      'bg-green-500/15 text-green-400 border border-green-500/20',
-    scheduled:   'bg-brand-500/15 text-brand-400 border border-brand-500/20',
-    completed:   'bg-white/5 text-white/40 border border-white/10',
-    cancelled:   'bg-red-500/15 text-red-400 border border-red-500/20',
-    maintenance: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-    inactive:    'bg-white/5 text-white/30 border border-white/10',
-    available:   'bg-green-500/15 text-green-400 border border-green-500/20',
-    unavailable: 'bg-red-500/15 text-red-400 border border-red-500/20',
+    active:      'bg-green-100 text-green-700 border border-green-300',
+    scheduled:   'bg-blue-100 text-blue-700 border border-blue-300',
+    completed:   'bg-gray-100 text-black border border-gray-300',
+    cancelled:   'bg-red-100 text-red-700 border border-red-300',
+    maintenance: 'bg-amber-100 text-amber-700 border border-amber-300',
+    inactive:    'bg-gray-100 text-black/70 border border-gray-300',
+    available:   'bg-green-100 text-green-700 border border-green-300',
+    unavailable: 'bg-red-100 text-red-700 border border-red-300',
   }
 
   const dots = {
-    active:      'bg-green-400',
-    scheduled:   'bg-brand-400',
-    completed:   'bg-white/30',
-    cancelled:   'bg-red-400',
-    maintenance: 'bg-amber-400',
-    inactive:    'bg-white/20',
-    available:   'bg-green-400',
-    unavailable: 'bg-red-400',
+    active:      'bg-green-600',
+    scheduled:   'bg-blue-600',
+    completed:   'bg-gray-500',
+    cancelled:   'bg-red-600',
+    maintenance: 'bg-amber-500',
+    inactive:    'bg-gray-500',
+    available:   'bg-green-600',
+    unavailable: 'bg-red-600',
   }
 
-  const cls    = styles[status] || 'bg-white/5 text-white/40 border border-white/10'
-  const dotCls = dots[status]   || 'bg-white/30'
+  const cls = styles[status] || 'bg-gray-100 text-black border border-gray-300'
+  const dot = dots[status] || 'bg-gray-500'
 
   return (
-    <span className={`badge ${cls}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${dotCls} ${status === 'active' ? 'animate-pulse' : ''}`} />
+    <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${cls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
       {status}
     </span>
   )
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
+// ── Modal ────────────────────────────────────────────────
 export function Modal({ open, onClose, title, children, size = 'md' }) {
   if (!open) return null
 
-  const sizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }
+  const sizes = {
+    sm: 'max-w-sm',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
+  }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4
-                 bg-black/60 backdrop-blur-sm animate-fade-in"
+                 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className={`w-full ${sizes[size]} bg-surface-800 border border-white/8
-                        rounded-2xl shadow-2xl animate-slide-up max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
-          <h2 className="text-base font-semibold text-white">{title}</h2>
+      <div className={`w-full ${sizes[size]} bg-white border border-gray-300
+                        rounded-2xl shadow-xl flex flex-col max-h-[90vh]`}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-black">{title}</h2>
+
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg
-                       text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                       text-black hover:bg-gray-100 transition"
           >
             <X size={16} />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto">{children}</div>
+
+        <div className="p-6 overflow-y-auto">
+          {children}
+        </div>
+
       </div>
     </div>
   )
 }
 
-// ── DataTable ─────────────────────────────────────────────────────────────────
+// ── DataTable ────────────────────────────────────────────
 export function DataTable({ columns, data, loading, emptyMessage = 'No records found.' }) {
   if (loading) {
     return (
       <div className="space-y-2">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
+          <div key={i} className="h-12 bg-gray-200 rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -104,7 +124,7 @@ export function DataTable({ columns, data, loading, emptyMessage = 'No records f
 
   if (!data?.length) {
     return (
-      <div className="text-center py-16 text-white/30">
+      <div className="text-center py-16 text-black/60">
         <p className="text-sm">{emptyMessage}</p>
       </div>
     )
@@ -113,77 +133,87 @@ export function DataTable({ columns, data, loading, emptyMessage = 'No records f
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
+
         <thead>
-          <tr className="border-b border-white/5">
+          <tr className="border-b border-gray-300">
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="text-left text-xs font-medium text-white/40
-                           uppercase tracking-wider py-3 px-4 first:pl-0"
+                className="text-left text-xs font-medium text-black uppercase tracking-wider py-3 px-4"
               >
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+
+        <tbody className="divide-y divide-gray-200">
           {data.map((row, i) => (
-            <tr key={row.id || i} className="hover:bg-white/3 transition-colors">
+            <tr key={row.id || i} className="hover:bg-gray-100 transition">
+
               {columns.map((col) => (
-                <td key={col.key} className="py-3 px-4 first:pl-0 text-white/80">
+                <td key={col.key} className="py-3 px-4 text-black">
                   {col.render ? col.render(row) : (row[col.key] ?? '—')}
                 </td>
               ))}
+
             </tr>
           ))}
         </tbody>
+
       </table>
     </div>
   )
 }
 
-// ── Spinner ───────────────────────────────────────────────────────────────────
+// ── Spinner ──────────────────────────────────────────────
 export function Spinner({ size = 20 }) {
   return (
     <svg
-      className="animate-spin text-brand-400"
+      className="animate-spin text-blue-600"
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
     >
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.2" />
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.2" />
       <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
     </svg>
   )
 }
 
-// ── Pagination ────────────────────────────────────────────────────────────────
+// ── Pagination ───────────────────────────────────────────
 export function Pagination({ page, total, perPage, onChange }) {
   const totalPages = Math.ceil(total / perPage)
   if (totalPages <= 1) return null
 
   return (
-    <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
-      <p className="text-xs text-white/40">
+    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-300">
+
+      <p className="text-xs text-black/60">
         Page {page} of {totalPages} · {total} total
       </p>
+
       <div className="flex gap-2">
+
         <button
           onClick={() => onChange(page - 1)}
           disabled={page === 1}
-          className="btn-ghost py-1.5 px-3 text-xs"
+          className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-100"
         >
           Previous
         </button>
+
         <button
           onClick={() => onChange(page + 1)}
           disabled={page >= totalPages}
-          className="btn-ghost py-1.5 px-3 text-xs"
+          className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-100"
         >
           Next
         </button>
+
       </div>
+
     </div>
   )
 }
