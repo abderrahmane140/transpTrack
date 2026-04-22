@@ -1,31 +1,33 @@
-import api from "./axios";
+import api from './axios'
 
-export const vehiclesApi   = {
-    list:    (params)     =>  api.get('/vehicles', {params}),
-    get:     (id)         =>  api.get(`/vehicles/${id}`),
-    create: (data)        =>  api.post('/vehicles', data),
-    update: (id,data)     =>  api.put(`/vehicles/${id}`, data),
-    delete: (id)          =>  api.delete(`/vehicles/${id}`)
+export { authApi } from './auth'
+
+// ── Vehicles ────────────────────────────────────────────────────────────────
+export const vehiclesApi = {
+  list:   (params)      => api.get('/vehicles', { params }),
+  get:    (id)          => api.get(`/vehicles/${id}`),
+  create: (data)        => api.post('/vehicles', data),
+  update: (id, data)    => api.put(`/vehicles/${id}`, data),
+  delete: (id)          => api.delete(`/vehicles/${id}`),
 }
 
-
-
 // ── Drivers ─────────────────────────────────────────────────────────────────
-export const driversApi  ={
-  list:            (params)   => api.get('/drivers', { params }),
-  get:             (id)       => api.get(`/drivers/${id}`),
-  create:          (data)     => api.post('/drivers', data),
-  update:          (id, data) => api.put(`/drivers/${id}`, data),
-  delete:          (id)       => api.delete(`/drivers/${id}`),
-  assignVehicle:   (id, data) => api.post(`/drivers/${id}/assign-vehicle`, data),
-  unassignVehicle: (id)       => api.delete(`/drivers/${id}/unassign-vehicle`),
-  myVehicle:       ()         => api.get('/my/vehicle'),
-  myActiveTrip:    ()         => api.get('/my/trip'),
+export const driversApi = {
+  list:             (params)   => api.get('/drivers', { params }),
+  get:              (id)       => api.get(`/drivers/${id}`),
+  create:           (data)     => api.post('/drivers', data),
+  update:           (id, data) => api.put(`/drivers/${id}`, data),
+  delete:           (id)       => api.delete(`/drivers/${id}`),
+  assignVehicle:    (id, data) => api.post(`/drivers/${id}/assign-vehicle`, data),
+  unassignVehicle:  (id)       => api.delete(`/drivers/${id}/unassign-vehicle`),
+  myVehicle:        ()         => api.get('/my/vehicle'),
+  myActiveTrip:     ()         => api.get('/my/trip'),
+  myScheduledTrip:  ()         => api.get('/my/scheduled-trip'),  // ← ADD
 }
 
 // ── Employees ────────────────────────────────────────────────────────────────
 export const employeesApi = {
-      list:         (params)   => api.get('/employees', { params }),
+  list:         (params)   => api.get('/employees', { params }),
   get:          (id)       => api.get(`/employees/${id}`),
   create:       (data)     => api.post('/employees', data),
   update:       (id, data) => api.put(`/employees/${id}`, data),
@@ -36,7 +38,7 @@ export const employeesApi = {
 }
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-export const routeApi = {
+export const routesApi = {
   list:       (params)              => api.get('/routes', { params }),
   get:        (id)                  => api.get(`/routes/${id}`),
   create:     (data)                => api.post('/routes', data),
@@ -48,9 +50,8 @@ export const routeApi = {
   deleteStop: (routeId, stopId)     => api.delete(`/stops/${stopId}`),
 }
 
-
 // ── Trips ────────────────────────────────────────────────────────────────────
-export const tripApi = {
+export const tripsApi = {
   list:      (params) => api.get('/trips', { params }),
   active:    ()       => api.get('/trips/active'),
   get:       (id)     => api.get(`/trips/${id}`),
@@ -60,7 +61,6 @@ export const tripApi = {
   delete:    (id)     => api.delete(`/trips/${id}`),
   employees: (id)     => api.get(`/trips/${id}/employees`),
 }
-
 
 // ── Locations ────────────────────────────────────────────────────────────────
 export const locationsApi = {
