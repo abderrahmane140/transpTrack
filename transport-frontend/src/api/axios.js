@@ -2,9 +2,8 @@ import axios from  'axios'
 import toast from 'react-hot-toast'
 
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: 'http://localhost:8000/api',
     headers : {Accept: 'application/json', 'Content-Type': 'application/json' },
-    withCredentials: true,
 });
 
 
@@ -21,13 +20,13 @@ api.interceptors.response.use(
         const status = error.response?.status
         const message = error.response?.data?.message
 
-        if (status === 401) {
+        if (status === 401) { //Unauthorized
             localStorage.removeItem('token')
             localStorage.removeItem('user')
             window.location.href = '/login'
-        } else if (status === 403) {
+        } else if (status === 403) {  //Forbidden
             toast.error(message || 'Access denied.')
-        } else if (status === 422) {
+        } else if (status === 422) { //Validation Error
             const errors = error.response?.data?.errors
             if(errors) Object.values(errors).flat().forEach((m) => toast.error(m))
             else toast.error(message || 'Validation error.')
