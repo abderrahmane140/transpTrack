@@ -6,7 +6,7 @@ import { Badge, Spinner } from '../../components/ui/index'
 import { useTripChannel } from '../../hooks/useEcho'
 import useTripStore from '../../store/tripStore'
 import useAuthStore from '../../store/authStore'
-import LiveMap from '../../components/map/Livemap'
+import LiveMap from '../../components/map/LiveMap'
 
 export default function EmployeeDashboard() {
   const { user }              = useAuthStore()
