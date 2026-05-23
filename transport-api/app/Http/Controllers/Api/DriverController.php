@@ -113,6 +113,7 @@ class DriverController extends Controller
             'license_expiry' => 'sometimes|date',
             'license_type'   => 'sometimes|in:A,B,C,D,EB',
             'is_available'   => 'sometimes|boolean',
+            'vehicle_id'     => 'nullable|exists:vehicles,id',
             'notes'          => 'nullable|string|max:500',
         ]);
 

@@ -5,33 +5,31 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Trip;
 use App\Services\SimulationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SimulationController extends Controller
 {
     public function __construct(
-        private readonly SimulationService $simulation
-    )
-    {}
+        private readonly SimulationService $simulation,
+    ) {}
 
     /**
      * POST /api/simulation/start/{trip}
      *
-     * Starts simulated GPS movement for a trip.
-     * The trip must already be active (started).
+     * Accepts optional pre-computed road waypoints from React frontend.
+     * Frontend fetches road route from OSRM (works from browser) then
+     * sends waypoints here so vehicle follows real roads.
      */
-
-    public function start(Request $request, Trip $trip)
+    public function start(Request $request, Trip $trip): JsonResponse
     {
-        //Trip must be active 
-        if(!$trip->isActive()) {
+        if (!$trip->isActive()) {
             return response()->json([
                 'message' => "Trip must be active to start simulation. Current status: '{$trip->status}'.",
                 'hint'    => 'Call POST /api/trips/{id}/start first.',
             ], 422);
         }
 
-        // Prevent double-starting
         if ($this->simulation->isRunning($trip->id)) {
             return response()->json([
                 'message' => "Simulation is already running for trip #{$trip->id}.",
@@ -39,89 +37,62 @@ class SimulationController extends Controller
             ], 422);
         }
 
-        // Load route stops (required for waypoint generation)
         $trip->load('route.stops');
 
         if ($trip->route->stops->count() < 2) {
-            return response()->json([
-                'message' => 'Route must have at least 2 stops to simulate movement.',
-            ], 422);
+            return response()->json(['message' => 'Route must have at least 2 stops.'], 422);
         }
 
+        $validated = $request->validate([
+            'waypoints'       => 'nullable|array|min:2',
+            'waypoints.*.lat' => 'required_with:waypoints|numeric|between:-90,90',
+            'waypoints.*.lng' => 'required_with:waypoints|numeric|between:-180,180',
+        ]);
+
+        $waypoints = $validated['waypoints'] ?? [];
 
         try {
-            $this->simulation->start($trip);
-        }catch (\RuntimeException $e) {
-             return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            $this->simulation->start($trip, $waypoints);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
         $state = $this->simulation->getState($trip->id);
 
         return response()->json([
-           'message'          => "Simulation started for trip #{$trip->id}.",
-            'trip_id'          => $trip->id,
-            'route'            => $trip->route->name,
-            'total_waypoints'  => $state['total_waypoints'],
-            'interval_seconds' => 3,
+            'message'                    => "Simulation started for trip #{$trip->id}.",
+            'trip_id'                    => $trip->id,
+            'route'                      => $trip->route->name,
+            'total_waypoints'            => $state['total_waypoints'],
+            'interval_seconds'           => 3,
+            'road_following'             => count($waypoints) > 0,
             'estimated_duration_seconds' => $state['total_waypoints'] * 3,
         ], 201);
     }
 
-    /**
-     * POST /api/simulation/stop/{trip}
-     *
-     * Stops the simulation. The trip remains active —
-     * you can restart simulation or have the driver take over with real GPS.
-     */
-
-    public function stop(Request $request, Trip $trip)
+    public function stop(Request $request, Trip $trip): JsonResponse
     {
         if (!$this->simulation->isRunning($trip->id)) {
-            return response()->json([
-                'message' => "No simulation is running for trip #{$trip->id}.",
-            ], 422);
+            return response()->json(['message' => "No simulation is running for trip #{$trip->id}."], 422);
         }
- 
         $this->simulation->stop($trip->id);
- 
-        return response()->json([
-            'message' => "Simulation stopped for trip #{$trip->id}. Trip is still active.",
-            'trip_id' => $trip->id,
-            'status'  => $trip->status,
-        ]);
+        return response()->json(['message' => "Simulation stopped for trip #{$trip->id}.", 'trip_id' => $trip->id]);
     }
 
-     /**
-     * GET /api/simulation/status/{trip}
-     *
-     * Returns current simulation progress.
-     */
-
-
-     public function status(Request $request, Trip $trip)
-     {
+    public function status(Request $request, Trip $trip): JsonResponse
+    {
         $state = $this->simulation->getState($trip->id);
-
-        if(!$state) {
-            return response()->json([
-                'is_running'      => false,
-                'trip_id'         => $trip->id,
-                'message'         => 'No simulation state found for this trip.',
-            ]);
+        if (!$state) {
+            return response()->json(['is_running' => false, 'trip_id' => $trip->id]);
         }
-
         $current = $state['current_index'];
         $total   = $state['total_waypoints'];
-        $percent = $total > 0 ? round(($current / $total) * 100, 1) : 0;
- 
         return response()->json([
             'is_running'       => $state['is_running'],
             'trip_id'          => $trip->id,
             'current_waypoint' => $current,
             'total_waypoints'  => $total,
-            'progress_percent' => $percent,
+            'progress_percent' => $total > 0 ? round(($current / $total) * 100, 1) : 0,
             'speed_kmh'        => $state['speed_kmh'],
             'started_at'       => $state['started_at'],
             'current_position' => $state['waypoints'][$current] ?? null,

@@ -54,7 +54,7 @@ class Vehicle extends Model
 
     public function activeTrip()
     {
-        return $this->hasMany(Trip::class)->where('status', 'active');
+        return $this->hasOne(Trip::class)->where('status', 'active');
     }
 
     public function locations()
