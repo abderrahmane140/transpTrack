@@ -1,0 +1,205 @@
+/* ─────────────────────────────────────────────────────────────
+   TranspTrack — Home page
+   Identity: white · black · single electric blue (#0A4DFF)
+   No gradient text. No floating-card bloat.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --tt-blue: #0A4DFF;
+  --tt-blue-soft: #EAF0FF;
+  --tt-ink: #0A0A0A;
+  --tt-paper: #FFFFFF;
+  --tt-line: #111111;
+  --tt-mute: #6B7280;
+}
+
+html { scroll-behavior: smooth; }
+
+body, .tt-page { background: var(--tt-paper); color: var(--tt-ink); }
+
+.tt-page {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Display type (editorial) ──────────────────────────────── */
+.tt-display {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+}
+
+.tt-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* ── Marquee ticker ────────────────────────────────────────── */
+@keyframes tt-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.tt-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: tt-marquee 40s linear infinite;
+}
+.tt-marquee:hover .tt-marquee-track { animation-play-state: paused; }
+
+/* ── Step rail line draw-on (scroll-driven via Framer) ─────── */
+.tt-rail-line {
+  position: absolute;
+  left: 0; right: 0; top: 1.25rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tt-ink) 8%, var(--tt-ink) 92%, transparent);
+  transform-origin: left center;
+}
+
+/* ── GPS signal ripple (around live vehicle) ───────────────── */
+@keyframes tt-ripple {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  80%  { transform: scale(3.0); opacity: 0;   }
+  100% { transform: scale(3.0); opacity: 0;   }
+}
+.tt-ripple { animation: tt-ripple 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; transform-origin: center; }
+.tt-ripple-2 { animation-delay: 0.6s; }
+.tt-ripple-3 { animation-delay: 1.2s; }
+
+/* ── Vehicle marker (used in mini-maps) ────────────────────── */
+.tt-vehicle-dot {
+  width: 14px; height: 14px;
+  background: var(--tt-blue);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(10, 77, 255, 0.25), 0 4px 14px rgba(10, 77, 255, 0.45);
+  position: relative;
+}
+.tt-vehicle-dot::after {
+  content: '';
+  position: absolute; inset: 50% 50%;
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 1px;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* ── Stop dot ──────────────────────────────────────────────── */
+.tt-stop {
+  width: 10px; height: 10px;
+  background: #fff;
+  border: 1.5px solid var(--tt-ink);
+  border-radius: 50%;
+  display: inline-block;
+}
+.tt-stop--next  { background: var(--tt-blue); border-color: var(--tt-blue); }
+.tt-stop--done  { background: var(--tt-ink); border-color: var(--tt-ink); }
+
+/* ── Live map dark filter (Leaflet tiles → near-monochrome) ─ */
+.tt-map-dark .leaflet-tile-pane {
+  filter: grayscale(1) invert(1) contrast(0.9) brightness(0.95) hue-rotate(180deg);
+}
+.tt-map-dark .leaflet-container { background: #0A0A0A; }
+
+/* Make the Leaflet attribution match dark UI */
+.tt-map-dark .leaflet-control-attribution {
+  background: rgba(10, 10, 10, 0.6);
+  color: rgba(255, 255, 255, 0.5);
+}
+.tt-map-dark .leaflet-control-attribution a { color: rgba(255, 255, 255, 0.7); }
+
+/* Hide zoom buttons in hero (we don't want UI clutter) */
+.tt-map-dark .leaflet-control-zoom { display: none; }
+
+/* ── Diagonal "blueprint" grid (very subtle) ──────────────── */
+.tt-grid {
+  background-image:
+    linear-gradient(rgba(10, 10, 10, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 10, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Press-style button ───────────────────────────────────── */
+.tt-btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.95rem 1.25rem;
+  background: var(--tt-ink);
+  color: #fff;
+  border-radius: 2px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.tt-btn-primary:hover { background: var(--tt-blue); transform: translateY(-1px); }
+
+.tt-btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.95rem 1.25rem;
+  border: 1px solid var(--tt-ink);
+  color: var(--tt-ink);
+  background: transparent;
+  border-radius: 2px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.tt-btn-ghost:hover { background: var(--tt-ink); color: #fff; }
+
+.tt-btn-on-dark {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.95rem 1.25rem;
+  background: #fff;
+  color: var(--tt-ink);
+  border-radius: 2px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.tt-btn-on-dark:hover { background: var(--tt-blue); color: #fff; transform: translateY(-1px); }
+
+/* ── Cursor blink for live indicator ──────────────────────── */
+@keyframes tt-blink { 50% { opacity: 0.25; } }
+.tt-blink { animation: tt-blink 1.4s ease-in-out infinite; }
+
+/* ── Draw-on line (for hero route, used by SVG path) ──────── */
+@keyframes tt-stroke {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Marquee cell (one entry in the ticker) ───────────────── */
+.tt-cell {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  padding: 0 1.5rem;
+  white-space: nowrap;
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+/* ── Bento hover lift ─────────────────────────────────────── */
+.tt-bento {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tt-bento:hover { transform: translateY(-3px); }
+
+/* ── Section dividers (single hairline) ───────────────────── */
+.tt-hr { height: 1px; background: rgba(10, 10, 10, 0.12); }
+.tt-hr-dark { height: 1px; background: rgba(255, 255, 255, 0.12); }
+
+/* ── Section labels (kicker text) ─────────────────────────── */
+.tt-kicker {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--tt-mute);
+}
+.tt-kicker::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: currentColor;
+  display: inline-block;
+}
+
+/* ── No-vertical-bar scrollbar in tickers ─────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

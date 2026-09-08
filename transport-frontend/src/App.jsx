@@ -4,6 +4,7 @@ import useAuthStore from './store/authStore'
 
 import Layout            from './components/layout/Layout'
 import Login             from './pages/auth/Login'
+import Home              from './pages/public/Home'
 import AdminDashboard    from './pages/admin/Dashboard'
 import Vehicles          from './pages/admin/Vehicles'
 import Drivers           from './pages/admin/Drivers'
@@ -28,11 +29,13 @@ function ProtectedRoute({ children, allowedRoles }) {
  
 function RootRedirect() {
   const { isLoggedIn, user } = useAuthStore()
-  if (!isLoggedIn()) return <Navigate to="/login" replace />
-  if (user?.role === 'admin')    return <Navigate to="/admin"    replace />
-  if (user?.role === 'driver')   return <Navigate to="/driver"   replace />
-  if (user?.role === 'employee') return <Navigate to="/employee" replace />
-  return <Navigate to="/login" replace />
+  if (isLoggedIn()) {
+    if (user?.role === 'admin')    return <Navigate to="/admin"    replace />
+    if (user?.role === 'driver')   return <Navigate to="/driver"   replace />
+    if (user?.role === 'employee') return <Navigate to="/employee" replace />
+  }
+  // Guests see the public landing page
+  return <Home />
 }
 function App() {
 
