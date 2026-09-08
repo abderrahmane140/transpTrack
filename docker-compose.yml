@@ -1,0 +1,92 @@
+services:
+  # ---------- Database ----------
+  db:
+    image: mysql:8.0
+    container_name: transptrack-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_DATABASE:-transptrack}
+      MYSQL_USER: ${DB_USERNAME:-transptrack}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - appnet
+
+  # ---------- Laravel API (PHP-FPM) ----------
+  api:
+    build:
+      context: ./transport-api
+      args:
+        APP_ENV: ${APP_ENV:-production}
+    container_name: transptrack-api
+    restart: unless-stopped
+    env_file:
+      - ./transport-api/.env
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-transptrack}
+      DB_USERNAME: ${DB_USERNAME:-transptrack}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+    volumes:
+      - api_storage:/var/www/html/storage
+      - api_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  # ---------- Nginx in front of Laravel API ----------
+  webapi:
+    image: nginx:1.27-alpine
+    container_name: transptrack-webapi
+    restart: unless-stopped
+    volumes:
+      - ./transport-api/docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "${API_PORT:-8080}:80"
+    depends_on:
+      - api
+    networks:
+      - appnet
+
+  # ---------- React frontend (built & served by Nginx) ----------
+  web:
+    build:
+      context: ./transport-frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY:-transport-key}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST:-localhost}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT:-8080}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-http}
+    container_name: transptrack-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
+
+volumes:
+  dbdata:
+  api_storage:
+  api_cache:

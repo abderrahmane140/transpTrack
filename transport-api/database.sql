@@ -255,3 +255,13 @@ CREATE TABLE cache_locks (
     expiration INT,
     INDEX (expiration)
 );
+
+
+-- # Terminal 1 — Laravel API
+-- php artisan serve
+
+-- # Terminal 2 — Queue worker (runs simulation jobs every 3s)
+-- php artisan queue:work --sleep=1
+
+-- # Terminal 3 — Reverb WebSocket server
+-- php artisan reverb:start --debug
